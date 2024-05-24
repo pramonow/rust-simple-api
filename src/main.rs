@@ -62,6 +62,7 @@ async fn random(Query(range): Query<RangeParameters>) -> String {
 }
 
 fn initialise_db() -> PooledConn {
+    // put your connection here for testing
     let url = "mysql://root:password@localhost:3306/test";
     let pool = Pool::new(url).unwrap();
     //creating a connection
@@ -69,6 +70,7 @@ fn initialise_db() -> PooledConn {
     conn
 }
 
+// this will fetch data from database
 fn get_farm(conn: &mut PooledConn, id:i64) -> Vec<entity::Employee> {
     let y=format!("select id, name from employee where id= {}",id);
 
