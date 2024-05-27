@@ -48,7 +48,7 @@ async fn fetch_employee(param: Query<EmployeeParam>) -> String {
     // but for example sake let's do this
     let mut conn = initialise_db();
 
-    let farm = get_farm(&mut conn, param.id);
+    let farm = get_employee(&mut conn, param.id);
     format!("{:?}", farm)
 }
 
@@ -71,7 +71,7 @@ fn initialise_db() -> PooledConn {
 }
 
 // this will fetch data from database
-fn get_farm(conn: &mut PooledConn, id:i64) -> Vec<entity::Employee> {
+fn get_employee(conn: &mut PooledConn, id:i64) -> Vec<entity::Employee> {
     let y=format!("select id, name from employee where id= {}",id);
 
     let res = conn.query_map(
