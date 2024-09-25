@@ -26,6 +26,7 @@ async fn main() {
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
     let app = Router::new().route("/", get(handler))
+        .route("/random", get(random))
         .route("/employee", get(fetch_employee));
     
 
@@ -36,16 +37,23 @@ async fn main() {
         .unwrap();
 }
 
+// hello world
+async fn handler() -> &'static str {
+    "Hello, world!"
+}
 
+// fetch employee data based on param
 async fn fetch_employee(param: Query<EmployeeParam>) -> String {
+    // init connection, ideally should use injection pattern
+    // but for example sake let's do this
     let mut conn = initialise_db();
-    let farm = get_farm(&mut conn, param.id);
 
+    let farm = get_employee(&mut conn, param.id);
     format!("{:?}", farm)
 }
 
-
-async fn handler(Query(range): Query<RangeParameters>) -> String {
+// example api for generating data
+async fn random(Query(range): Query<RangeParameters>) -> String {
     // Generate a random number in range parsed from query.
     let random_number = thread_rng().gen_range(range.start..range.end);
 
@@ -54,6 +62,7 @@ async fn handler(Query(range): Query<RangeParameters>) -> String {
 }
 
 fn initialise_db() -> PooledConn {
+    // put your connection here for testing
     let url = "mysql://root:password@localhost:3306/test";
     let pool = Pool::new(url).unwrap();
     //creating a connection
@@ -61,7 +70,8 @@ fn initialise_db() -> PooledConn {
     conn
 }
 
-fn get_farm(conn: &mut PooledConn, id:i64) -> Vec<entity::Employee> {
+// this will fetch data from database
+fn get_employee(conn: &mut PooledConn, id:i64) -> Vec<entity::Employee> {
     let y=format!("select id, name from employee where id= {}",id);
 
     let res = conn.query_map(
